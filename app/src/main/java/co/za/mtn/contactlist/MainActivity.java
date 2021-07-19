@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recycler_view);
 
         //Check permission
-        checkPermission()
+        checkPermission();
     }
 
     private void checkPermission() {
