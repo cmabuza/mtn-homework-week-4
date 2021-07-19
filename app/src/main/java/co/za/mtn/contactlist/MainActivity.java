@@ -1,5 +1,6 @@
 package co.za.mtn.contactlist;
 
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -8,20 +9,31 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.Toast;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
+
+
 
 public class MainActivity extends AppCompatActivity {
     //initialize variable
     RecyclerView recyclerView;
     ArrayList<ContactModel> arrayList = new ArrayList<ContactModel>();
     MainAdapter adapter;
+
 
 
     @Override
@@ -32,8 +44,29 @@ public class MainActivity extends AppCompatActivity {
         //assign variable
         recyclerView = findViewById(R.id.recycler_view);
 
+        //Handling clicks
+        recyclerView.addOnItemTouchListener(
+                new RecyclerItemClickListener(this, recyclerView ,new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override public void onItemClick(View view, int position) {
+                        Share(arrayList.get(position).name, arrayList.get(position).number);
+                    }
+
+                    @Override public void onLongItemClick(View view, int position) {
+                        // do whatever
+                    }
+                })
+        );
         //Check permission
         checkPermission();
+    }
+
+    //Share function
+    public void Share(String name, String number){
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_TEXT, name);
+        intent.putExtra(Intent.EXTRA_TEXT, name + " " + number);
+        startActivity(Intent.createChooser(intent, "Share using"));
     }
 
     private void checkPermission() {
@@ -50,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
             getContactList();
         }
     }
+
 
     private void getContactList() {
         //Initialize Uri Uri
@@ -111,6 +145,7 @@ public class MainActivity extends AppCompatActivity {
         adapter = new MainAdapter(this,arrayList);
         //Set adapter
         recyclerView.setAdapter(adapter);
+
     }
 
     @Override
